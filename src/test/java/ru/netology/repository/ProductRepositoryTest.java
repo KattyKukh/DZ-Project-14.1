@@ -7,8 +7,6 @@ import ru.netology.domain.Book;
 import ru.netology.domain.Product;
 import ru.netology.domain.Smartphone;
 
-import javax.management.StringValueExp;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ProductRepositoryTest {
@@ -27,6 +25,7 @@ public class ProductRepositoryTest {
     Product product9 = new Smartphone(39, "4568 smart", 100, "Samsung");
     Product product10 = new Smartphone(40, "5689 smart", 100, "Xiaomi");
     Product product11 = new Product(41, "ProductNobookNoSmart", 40_000);
+    Product product12 = new Smartphone(36, "5789 smart", 500, "Xiaomi");
 
     public void prepare() {
         repo.save(product1);
@@ -44,10 +43,18 @@ public class ProductRepositoryTest {
     @Test
     public void shouldSaveProductAndFindAll() {
         prepare();
-        repo.save(product11);
-        Product[] expected = {product1, product2, product3, product4, product5, product6, product7, product8, product9, product10, product11};
+        Product[] expected = {product1, product2, product3, product4, product5, product6, product7, product8, product9, product10};
         Product[] actual = repo.findAll();
         assertArrayEquals(expected, actual);
+
+    }
+
+    @Test
+    public void shouldThrowReportIfTrySaveProductWithAlreadyExistsId() {
+        repo.save(product12);
+        assertThrows(AlreadyExistsException.class, () -> {
+            repo.save(product12);
+        });
 
     }
 
@@ -100,7 +107,6 @@ public class ProductRepositoryTest {
     })
     public void shouldThrowReportIfTryRemoveByNotExistingId(int id) {
         prepare();
-        String expected = "Element with id: " + id + " not found";
         assertThrows(NotFoundException.class, () -> {
             repo.removeById(id);
         });
